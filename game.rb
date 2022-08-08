@@ -1,32 +1,46 @@
-# class Codebreaker
+class Codebreaker
+  attr_reader :colour_legend
 
-# end
+  def initialize
+    @guess = []
+    @input = ''
+  end
+
+  def input_prompt
+    print "Choose four numbers out of the following eight options:\n"
+    print "1, 2, 3, 4, 5, 6, 7, 8\n"
+    print "For example: '1 8 7 7'.\n"
+    @input = gets.chomp
+  end
+
+  def valid_input?
+    array = @input.split(' ')
+    return false if array.length != 4
+
+    array.each do |i|
+      # return false if [1, 2, 3, 4, 5, 6, 7, 8].include?(+i) == false
+      p [1, 2, 3, 4, 5, 6, 7, 8].include?(i.to_i)
+    end
+  end
+end
 
 class Codemaker
   def initialize
-    @colours = [1, 2, 3, 4, 5, 6, 7, 8]
+    @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
     @secret_combination = []
-    @colour_legend = {  1 => 'black',
-                        2 => 'white',
-                        3 => 'purple',
-                        4 => 'orange',
-                        5 => 'green',
-                        6 => 'yellow',
-                        7 => 'blue',
-                        8 => 'magenta' }
     generate_code
   end
 
   def generate_code
     4.times do
-      @secret_combination.push(@colours.sample)
+      @secret_combination.push(@numbers.sample)
     end
   end
 
+  private
+
   def display_code
-    @secret_combination.each do |colour|
-      print "#{@colour_legend[colour]} "
-    end
+    p @secret_combination
   end
 end
 
@@ -34,5 +48,9 @@ end
 #   @keys = %w[white red]
 # end
 
-code = Codemaker.new
-code.display_code
+# code = Codemaker.new
+# code.display_code
+
+guess = Codebreaker.new
+guess.input_prompt
+p guess.valid_input?
