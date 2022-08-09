@@ -1,26 +1,30 @@
 class Codebreaker
-  attr_reader :colour_legend
+  attr_reader :input
 
   def initialize
+    @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
     @guess = []
     @input = ''
   end
 
   def input_prompt
-    print "Choose four numbers out of the following eight options:\n"
-    print "1, 2, 3, 4, 5, 6, 7, 8\n"
-    print "For example: '1 8 7 7'.\n"
-    @input = gets.chomp
+    puts "Choose four numbers out of the following eight options:\n"
+    puts "1, 2, 3, 4, 5, 6, 7, 8\n"
+    puts "For example: '1 8 7 7'.\n"
+    @input = gets.chomp.split(' ')
   end
 
   def valid_input?
-    array = @input.split(' ')
-    return false if array.length != 4
+    return false if @input.length != 4
 
-    array.each do |i|
-      # return false if [1, 2, 3, 4, 5, 6, 7, 8].include?(+i) == false
-      p [1, 2, 3, 4, 5, 6, 7, 8].include?(i.to_i)
+    @input.each do |i|
+      return false unless @numbers.include?(i.to_i)
     end
+    true
+  end
+
+  def convert_to_i
+    @input.map!(&:to_i)
   end
 end
 
@@ -37,20 +41,32 @@ class Codemaker
     end
   end
 
-  private
+  # private
 
   def display_code
     p @secret_combination
   end
 end
 
-# class RunGame
-#   @keys = %w[white red]
-# end
+class RunGame
+  turn = 0
+  code = Codemaker.new
+  puts "\nSecret code #{code.display_code}\n"
+  # Line above will be removed
 
-# code = Codemaker.new
-# code.display_code
+  while turn < 12
+    puts "Number of turn: #{turn}\n\n"
+    guess = Codebreaker.new
+    guess.input_prompt
+    if guess.valid_input? == true
+      turn += 1
+      break if guess.convert_to_i == code.display_code
+    else
+      puts "\nInvalid input. Try again.\n"
+      puts "Number of turn: #{turn}\n\n"
+      guess.input_prompt
+    end
+  end
+end
 
-guess = Codebreaker.new
-guess.input_prompt
-p guess.valid_input?
+RunGame.new
