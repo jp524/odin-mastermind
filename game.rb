@@ -29,8 +29,8 @@ class Input
   end
 end
 
-# Generates the secret code and verifies guesses made by the Codebreaker
-class Codemaker
+# Generates a secret code and verifies guesses made by the CodebreakerPlayer
+class CodemakerComputer
   def initialize
     @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
     @secret_combination = []
@@ -67,32 +67,40 @@ class Codemaker
   end
 end
 
-# User chooses to be the Codebreaker
-class Codebreaker
-  def self.play
-    turn = 0
-    code = Codemaker.new
-    puts "You have 12 turns to guess the secret combination.\n\n"
-    puts "Feedback of 'red peg' means a number was in the correct spot."
-    puts "'White peg' means a number is part of the code but not in the correct spot."
+def codemaker_player
+  code = Input.new
+  code.input_prompt
+  until code.valid_input?
+    puts "\nInvalid input. Try again.\n"
+    code.input_prompt
+  end
+  puts "Code: #{code.convert_to_i}"
+  puts 'Start CodebreakerComputer'
+end
 
-    while turn < 12
-      puts "\nNumber of turns: #{turn}\n\n"
-      guess = Input.new
-      guess.input_prompt
-      if guess.valid_input? == true
-        turn += 1
-        if code.correct_guess?(guess.convert_to_i) == true
-          puts "\nYou guessed correctly in #{turn} turns!"
-          break
-        else
-          code.check_guess(guess.convert_to_i)
-        end
+def codebreaker_player
+  turn = 0
+  code = CodemakerComputer.new
+  puts "You have 12 turns to guess the secret combination.\n\n"
+  puts "Feedback of 'red peg' means a number was in the correct spot."
+  puts "'White peg' means a number is part of the code but not in the correct spot."
+
+  while turn < 12
+    puts "\nNumber of turns: #{turn}\n\n"
+    guess = Input.new
+    guess.input_prompt
+    if guess.valid_input? == true
+      turn += 1
+      if code.correct_guess?(guess.convert_to_i) == true
+        puts "\nYou guessed correctly in #{turn} turns!"
+        break
       else
-        puts "\nInvalid input. Try again.\n"
-        puts "\n\nNumber of turns: #{turn}\n\n"
-        guess.input_prompt
+        code.check_guess(guess.convert_to_i)
       end
+    else
+      puts "\nInvalid input. Try again.\n"
+      puts "\n\nNumber of turns: #{turn}\n\n"
+      guess.input_prompt
     end
   end
 end
@@ -106,9 +114,9 @@ class RunGame
     role = gets.chomp
     case role
     when '1'
-      puts 'Codemaker'
+      codemaker_player
     when '2'
-      Codebreaker.play
+      codebreaker_player
     else
       puts 'Invalid input.'
     end
