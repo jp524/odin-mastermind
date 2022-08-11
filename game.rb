@@ -1,5 +1,7 @@
-# Gets user input to try to break the secret code set by the Codemaker
-class Codebreaker
+# frozen_string_literal: false
+
+# Gets user input to generate a secret code
+class Input
   attr_reader :input
 
   def initialize
@@ -65,30 +67,50 @@ class Codemaker
   end
 end
 
-class RunGame
-  turn = 0
-  code = Codemaker.new
-  puts "\nWelcome to Mastermind!\n\n"
-  puts "You have 12 turns to guess the secret combination.\n\n"
-  puts "Feedback of 'red peg' means a number was in the correct spot."
-  puts "'White peg' means a number is part of the code but not in the correct spot."
+# User chooses to be the Codebreaker
+class Codebreaker
+  def self.play
+    turn = 0
+    code = Codemaker.new
+    puts "You have 12 turns to guess the secret combination.\n\n"
+    puts "Feedback of 'red peg' means a number was in the correct spot."
+    puts "'White peg' means a number is part of the code but not in the correct spot."
 
-  while turn < 12
-    puts "\nNumber of turns: #{turn}\n\n"
-    guess = Codebreaker.new
-    guess.input_prompt
-    if guess.valid_input? == true
-      turn += 1
-      if code.correct_guess?(guess.convert_to_i) == true
-        puts "\nYou guessed correctly in #{turn} turns!"
-        break
-      else
-        code.check_guess(guess.convert_to_i)
-      end
-    else
-      puts "\nInvalid input. Try again.\n"
-      puts "\n\nNumber of turns: #{turn}\n\n"
+    while turn < 12
+      puts "\nNumber of turns: #{turn}\n\n"
+      guess = Input.new
       guess.input_prompt
+      if guess.valid_input? == true
+        turn += 1
+        if code.correct_guess?(guess.convert_to_i) == true
+          puts "\nYou guessed correctly in #{turn} turns!"
+          break
+        else
+          code.check_guess(guess.convert_to_i)
+        end
+      else
+        puts "\nInvalid input. Try again.\n"
+        puts "\n\nNumber of turns: #{turn}\n\n"
+        guess.input_prompt
+      end
+    end
+  end
+end
+
+# Starts game
+class RunGame
+  role = ''
+
+  while role != '1' && role != '2'
+    puts "\nWelcome to Mastermind! Would you like to be the Codemaker (1) or Codebreaker (2)? Type 1 or 2:\n"
+    role = gets.chomp
+    case role
+    when '1'
+      puts 'Codemaker'
+    when '2'
+      Codebreaker.play
+    else
+      puts 'Invalid input.'
     end
   end
 end
