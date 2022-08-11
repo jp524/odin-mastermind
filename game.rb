@@ -41,7 +41,11 @@ class Codemaker
     end
   end
 
-  # private
+  def correct_guess?(guess)
+    return true if guess.convert_to_i == @secret_combination
+  end
+
+  private
 
   def display_code
     p @secret_combination
@@ -51,19 +55,20 @@ end
 class RunGame
   turn = 0
   code = Codemaker.new
-  puts "\nSecret code #{code.display_code}\n"
-  # Line above will be removed
 
   while turn < 12
-    puts "Number of turn: #{turn}\n\n"
+    puts "Number of turns: #{turn}\n\n"
     guess = Codebreaker.new
     guess.input_prompt
     if guess.valid_input? == true
       turn += 1
-      break if guess.convert_to_i == code.display_code
+      if code.correct_guess?(guess) == true
+        puts "\nYou guess correctly in #{turn} turns!"
+        break
+      end
     else
       puts "\nInvalid input. Try again.\n"
-      puts "Number of turn: #{turn}\n\n"
+      puts "Number of turns: #{turn}\n\n"
       guess.input_prompt
     end
   end
