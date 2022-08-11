@@ -8,9 +8,8 @@ class Codebreaker
   end
 
   def input_prompt
-    puts "Choose four numbers out of the following eight options:\n"
-    puts "1, 2, 3, 4, 5, 6, 7, 8\n"
-    puts "For example: '1 8 7 7'.\n"
+    puts "Choose four numbers out of the following eight options: 1, 2, 3, 4, 5, 6, 7, 8\n"
+    puts "For example: '1 8 7 7'.\n\n"
     @input = gets.chomp.split(' ')
   end
 
@@ -42,10 +41,23 @@ class Codemaker
   end
 
   def correct_guess?(guess)
-    return true if guess.convert_to_i == @secret_combination
+    return true if guess == @secret_combination
   end
 
-  private
+  def check_guess(guess)
+    new_combination = @secret_combination.dup
+    guess.each_with_index do |number, i|
+      if number == @secret_combination[i]
+        puts 'red peg'
+        new_combination[i] = 'X'
+      end
+    end
+    guess.each do |number|
+      puts 'white peg' if new_combination.include?(number)
+    end
+  end
+
+  # private
 
   def display_code
     p @secret_combination
@@ -55,6 +67,7 @@ end
 class RunGame
   turn = 0
   code = Codemaker.new
+  puts "\nSecret code #{code.display_code}\n"
 
   while turn < 12
     puts "Number of turns: #{turn}\n\n"
@@ -62,9 +75,11 @@ class RunGame
     guess.input_prompt
     if guess.valid_input? == true
       turn += 1
-      if code.correct_guess?(guess) == true
-        puts "\nYou guess correctly in #{turn} turns!"
+      if code.correct_guess?(guess.convert_to_i) == true
+        puts "\nYou guessed correctly in #{turn} turns!"
         break
+      else
+        code.check_guess(guess.convert_to_i)
       end
     else
       puts "\nInvalid input. Try again.\n"
