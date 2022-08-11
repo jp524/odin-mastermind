@@ -1,3 +1,4 @@
+# Gets user input to try to break the secret code set by the Codemaker
 class Codebreaker
   attr_reader :input
 
@@ -9,7 +10,6 @@ class Codebreaker
 
   def input_prompt
     puts "Choose four numbers out of the following eight options: 1, 2, 3, 4, 5, 6, 7, 8\n"
-    puts "For example: '1 8 7 7'.\n\n"
     @input = gets.chomp.split(' ')
   end
 
@@ -27,6 +27,7 @@ class Codebreaker
   end
 end
 
+# Generates the secret code and verifies guesses made by the Codebreaker
 class Codemaker
   def initialize
     @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -57,7 +58,7 @@ class Codemaker
     end
   end
 
-  # private
+  private
 
   def display_code
     p @secret_combination
@@ -67,10 +68,13 @@ end
 class RunGame
   turn = 0
   code = Codemaker.new
-  puts "\nSecret code #{code.display_code}\n"
+  puts "\nWelcome to Mastermind!\n\n"
+  puts "You have 12 turns to guess the secret combination.\n\n"
+  puts "Feedback of 'red peg' means a number was in the correct spot."
+  puts "'White peg' means a number is part of the code but not in the correct spot."
 
   while turn < 12
-    puts "Number of turns: #{turn}\n\n"
+    puts "\nNumber of turns: #{turn}\n\n"
     guess = Codebreaker.new
     guess.input_prompt
     if guess.valid_input? == true
@@ -83,7 +87,7 @@ class RunGame
       end
     else
       puts "\nInvalid input. Try again.\n"
-      puts "Number of turns: #{turn}\n\n"
+      puts "\n\nNumber of turns: #{turn}\n\n"
       guess.input_prompt
     end
   end
