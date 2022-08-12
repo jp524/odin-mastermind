@@ -48,15 +48,12 @@ class CodemakerComputer
   end
 
   def check_guess(guess)
-    new_combination = @secret_combination.dup
-    guess.each_with_index do |number, i|
-      if number == @secret_combination[i]
+    @secret_combination.each_with_index do |number, i|
+      if number == guess[i]
         puts 'red peg'
-        new_combination[i] = 'X'
+      elsif guess.include?(number)
+        puts 'white peg'
       end
-    end
-    guess.each do |number|
-      puts 'white peg' if new_combination.include?(number)
     end
   end
 
@@ -71,7 +68,7 @@ def codemaker_player
   code = Input.new
   code.input_prompt
   until code.valid_input?
-    puts "\nInvalid input. Try again.\n"
+    puts "\nInvalid input. Try again."
     code.input_prompt
   end
   puts "Code: #{code.convert_to_i}"
@@ -103,6 +100,8 @@ def codebreaker_player
       guess.input_prompt
     end
   end
+
+  puts "\nYou used all 12 turns. Try again!" if turn == 12
 end
 
 # Starts game
