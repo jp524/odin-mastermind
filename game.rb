@@ -72,8 +72,6 @@ end
 
 # Starts the initial round for the computer to play as the Codebreaker
 class CodebreakerComputer
-  attr_reader :all_solutions, :code, :guess
-
   include Feedback
 
   def initialize(code)
@@ -87,21 +85,28 @@ class CodebreakerComputer
     check_guess(@code, @guess)
   end
 
-  def correct_guess_computer?
-    correct_guess?(@code, @guess)
+  def filter_solutions(pegs)
+    @all_solutions.reject! do |possible_solution|
+      pegs == check_guess(@code, possible_solution)
+    end
   end
 
   def play
-    # while @turn < 12
+    puts "Number of possble solutions : #{@all_solutions.length}"
+    while @turn < 12
+      @turn += 1
       puts "\nNumber of turns: #{@turn}\n\n"
-      # @turn += 1
-      if correct_guess_computer? == true
+      puts "Code : #{@code}"
+      puts "Computer guess : #{@guess}"
+      pegs = check_guess_computer
+      if pegs[:red] == 4
         puts "\nThe computer guessed your code in #{@turn} turns!"
-        # break
-      else
-        puts check_guess_computer
+        break
       end
-    # end
+      filter_solutions(pegs)
+      @guess = @all_solutions[0]
+      puts "Number of possble solutions : #{@all_solutions.length}"
+    end
   end
 end
 
