@@ -1,7 +1,7 @@
 # frozen_string_literal: false
 
 # Compares a secret code and a guess and provides feedback
-module Verification
+module Feedback
   def check_guess(code, guess)
     pegs = { red: 0, white: 0 }
     code.each_with_index do |number, i|
@@ -13,10 +13,6 @@ module Verification
       end
     end
     pegs
-  end
-
-  def correct_guess?(code, guess)
-    return true if guess == code
   end
 end
 
@@ -51,7 +47,7 @@ end
 
 # Generates a secret code and verifies guesses made by the CodebreakerPlayer
 class CodemakerComputer
-  include Verification
+  include Feedback
 
   def initialize
     @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -69,10 +65,6 @@ class CodemakerComputer
     check_guess(@secret_combination, guess)
   end
 
-  def correct_guess_player?(guess)
-    correct_guess?(@secret_combination, guess)
-  end
-
   def display_code
     @secret_combination
   end
@@ -80,9 +72,10 @@ end
 
 # Starts the initial round for the computer to play as the Codebreaker
 class CodebreakerComputer
-  attr_reader :all_solutions
+  attr_reader :all_solutions, :code, :guess
 
-  include Verification
+  include Feedback
+
   def initialize(code)
     @code = code
     @turn = 0
@@ -139,18 +132,17 @@ class CodebreakerPlayer
 
   def play
     while @turn < 12
-      puts "\nNumber of turns: #{@turn}\n\n"
+      puts "\nNumber of turns: #{@turn + 1}\n\n"
       guess = Input.new
       guess.input_prompt
       if guess.valid_input? == true
         @turn += 1
-        if @code.correct_guess_player?(guess.convert_to_i) == true
+        pegs = @code.check_guess_player(guess.convert_to_i)
+        if pegs[:red] == 4
           puts "\nYou guessed correctly in #{@turn} turns!"
           break
-        else
-          pegs = @code.check_guess_player(guess.convert_to_i)
-          puts "Red peg: #{pegs[:red]}. White peg: #{pegs[:white]}"
         end
+        puts "Red peg: #{pegs[:red]}. White peg: #{pegs[:white]}"
       else
         puts "\nInvalid input. Try again.\n"
       end
