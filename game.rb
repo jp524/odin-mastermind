@@ -73,12 +73,21 @@ end
 
 # Starts the initial round for the computer to play as the Codebreaker
 class CodebreakerComputer
-  include Verification
+  attr_reader :all_guesses
 
+  include Verification
   def initialize
     @turn = 0
     @guess = [1, 1, 2, 2]
     @all_guesses = (1111..7777).to_a
+    format_all_guesses
+  end
+
+  # Converts 1111 to [1, 1, 1, 1] for example
+  def format_all_guesses
+    @all_guesses.map! do |guess|
+      guess.to_s.split('').map!(&:to_i)
+    end
   end
 
   def check_guess_computer(code)
@@ -99,7 +108,8 @@ def codemaker_player
   end
   puts "Code: #{code.convert_to_i}"
   play = CodebreakerComputer.new
-  play.check_guess_computer(code.convert_to_i)
+  p play.all_guesses.length
+  # play.check_guess_computer(code.convert_to_i)
 end
 
 def codebreaker_player
