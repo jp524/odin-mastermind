@@ -48,8 +48,6 @@ end
 
 # Generates a secret code and verifies guesses made by the CodebreakerPlayer
 class CodemakerComputer
-  attr_reader :secret_combination
-
   include Verification
 
   def initialize
@@ -63,17 +61,32 @@ class CodemakerComputer
       @secret_combination.push(@numbers.sample)
     end
   end
+
+  def check_guess_player(guess)
+    check_guess(@secret_combination, guess)
+  end
+
+  def correct_guess_player?(guess)
+    correct_guess?(@secret_combination, guess)
+  end
 end
 
 # Starts the initial round for the computer to play as the Codebreaker
 class CodebreakerComputer
-  attr_reader :guess
-
   include Verification
 
   def initialize
     @turn = 0
     @guess = [1, 1, 2, 2]
+    @all_guesses = (1111..7777).to_a
+  end
+
+  def check_guess_computer(code)
+    check_guess(code, @guess)
+  end
+
+  def correct_guess_computer?(code)
+    correct_guess?(code, @guess)
   end
 end
 
@@ -86,7 +99,7 @@ def codemaker_player
   end
   puts "Code: #{code.convert_to_i}"
   play = CodebreakerComputer.new
-  play.check_guess(code.convert_to_i, play.guess)
+  play.check_guess_computer(code.convert_to_i)
 end
 
 def codebreaker_player
@@ -102,11 +115,11 @@ def codebreaker_player
     guess.input_prompt
     if guess.valid_input? == true
       turn += 1
-      if code.correct_guess?(code.secret_combination, guess.convert_to_i) == true
+      if code.correct_guess_player?(guess.convert_to_i) == true
         puts "\nYou guessed correctly in #{turn} turns!"
         break
       else
-        code.check_guess(code.secret_combination, guess.convert_to_i)
+        code.check_guess_player(guess.convert_to_i)
       end
     else
       puts "\nInvalid input. Try again.\n"
