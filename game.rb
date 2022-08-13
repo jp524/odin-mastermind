@@ -1,6 +1,23 @@
 # frozen_string_literal: false
 
-# Gets user input to generate a secret code
+# Compares a secret code and a guess and provides feedback
+module Verification
+  def check_guess(code, guess)
+    code.each_with_index do |number, i|
+      if number == guess[i]
+        puts 'red peg'
+      elsif guess.include?(number)
+        puts 'white peg'
+      end
+    end
+  end
+
+  def correct_guess?(code, guess)
+    return true if guess == code
+  end
+end
+
+# Gets user input to generate a code
 class Input
   attr_reader :input
 
@@ -31,6 +48,10 @@ end
 
 # Generates a secret code and verifies guesses made by the CodebreakerPlayer
 class CodemakerComputer
+  attr_reader :secret_combination
+
+  include Verification
+
   def initialize
     @numbers = [1, 2, 3, 4, 5, 6, 7, 8]
     @secret_combination = []
@@ -42,25 +63,17 @@ class CodemakerComputer
       @secret_combination.push(@numbers.sample)
     end
   end
+end
 
-  def correct_guess?(guess)
-    return true if guess == @secret_combination
-  end
+# Starts the initial round for the computer to play as the Codebreaker
+class CodebreakerComputer
+  attr_reader :guess
 
-  def check_guess(guess)
-    @secret_combination.each_with_index do |number, i|
-      if number == guess[i]
-        puts 'red peg'
-      elsif guess.include?(number)
-        puts 'white peg'
-      end
-    end
-  end
+  include Verification
 
-  private
-
-  def display_code
-    p @secret_combination
+  def initialize
+    @turn = 0
+    @guess = [1, 1, 2, 2]
   end
 end
 
@@ -72,7 +85,8 @@ def codemaker_player
     code.input_prompt
   end
   puts "Code: #{code.convert_to_i}"
-  puts 'Start CodebreakerComputer'
+  play = CodebreakerComputer.new
+  play.check_guess(code.convert_to_i, play.guess)
 end
 
 def codebreaker_player
@@ -88,11 +102,11 @@ def codebreaker_player
     guess.input_prompt
     if guess.valid_input? == true
       turn += 1
-      if code.correct_guess?(guess.convert_to_i) == true
+      if code.correct_guess?(code.secret_combination, guess.convert_to_i) == true
         puts "\nYou guessed correctly in #{turn} turns!"
         break
       else
-        code.check_guess(guess.convert_to_i)
+        code.check_guess(code.secret_combination, guess.convert_to_i)
       end
     else
       puts "\nInvalid input. Try again.\n"
