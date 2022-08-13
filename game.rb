@@ -112,46 +112,52 @@ class CodebreakerComputer
   end
 end
 
-def codemaker_player
-  code = Input.new
-  code.input_prompt
-  until code.valid_input?
-    puts "\nInvalid input. Try again."
+# Starts game when player is the codemaker. After the code is set, the CodebreakerComputer class is called
+class CodemakerPlayer
+  def play
+    code = Input.new
     code.input_prompt
+    until code.valid_input?
+      puts "\nInvalid input. Try again."
+      code.input_prompt
+    end
+    puts "Code: #{code.convert_to_i}"
+    computer = CodebreakerComputer.new(code.convert_to_i)
+    computer.play
   end
-  puts "Code: #{code.convert_to_i}"
-  computer = CodebreakerComputer.new(code.convert_to_i)
-  computer.play
 end
 
-def codebreaker_player
-  turn = 0
-  code = CodemakerComputer.new
-  puts "You have 12 turns to guess the secret combination.\n\n"
-  puts "Feedback of 'red peg' means a number was in the correct spot."
-  puts "'White peg' means a number is part of the code but not in the correct spot."
-
-  while turn < 12
-    puts "\nNumber of turns: #{turn}\n\n"
-    guess = Input.new
-    guess.input_prompt
-    if guess.valid_input? == true
-      turn += 1
-      if code.correct_guess_player?(guess.convert_to_i) == true
-        puts "\nYou guessed correctly in #{turn} turns!"
-        break
-      else
-        pegs = code.check_guess_player(guess.convert_to_i)
-        puts "Red peg: #{pegs[:red]}. White peg: #{pegs[:white]}"
-      end
-    else
-      puts "\nInvalid input. Try again.\n"
-      puts "\n\nNumber of turns: #{turn}\n\n"
-      guess.input_prompt
-    end
+# Starts game when player is the codebreaker. The game runs until the code is guessed or until 12 turns are up
+class CodebreakerPlayer
+  def initialize
+    @turn = 0
+    @code = CodemakerComputer.new
+    puts "You have 12 turns to guess the secret combination.\n\n"
+    puts "Feedback of 'red peg' means a number was in the correct spot."
+    puts "'White peg' means a number is part of the code but not in the correct spot."
   end
 
-  puts "\nYou used all 12 turns. Try again!. The code was #{code.display_code}." if turn == 12
+  def play
+    while @turn < 12
+      puts "\nNumber of turns: #{@turn}\n\n"
+      guess = Input.new
+      guess.input_prompt
+      if guess.valid_input? == true
+        @turn += 1
+        if @code.correct_guess_player?(guess.convert_to_i) == true
+          puts "\nYou guessed correctly in #{@turn} turns!"
+          break
+        else
+          pegs = @code.check_guess_player(guess.convert_to_i)
+          puts "Red peg: #{pegs[:red]}. White peg: #{pegs[:white]}"
+        end
+      else
+        puts "\nInvalid input. Try again.\n"
+      end
+    end
+
+    puts "\nYou used all 12 turns. Try again!. The code was #{code.display_code}." if @turn == 12
+  end
 end
 
 # Starts game
@@ -163,9 +169,11 @@ class RunGame
     role = gets.chomp
     case role
     when '1'
-      codemaker_player
+      game = CodemakerPlayer.new
+      game.play
     when '2'
-      codebreaker_player
+      game = CodebreakerPlayer.new
+      game.play
     else
       puts 'Invalid input.'
     end
