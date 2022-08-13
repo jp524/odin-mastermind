@@ -3,13 +3,13 @@
 # Compares a secret code and a guess and provides feedback
 module Verification
   def check_guess(code, guess)
-    pegs = []
+    pegs = { red: 0, white: 0 }
     code.each_with_index do |number, i|
       if number == guess[i]
-        pegs.push('red')
+        pegs[:red] += 1
         next
       elsif guess.include?(number)
-        pegs.push('white')
+        pegs[:white] += 1
       end
     end
     pegs
@@ -80,29 +80,35 @@ end
 
 # Starts the initial round for the computer to play as the Codebreaker
 class CodebreakerComputer
-  attr_reader :all_guesses
+  attr_reader :all_solutions
 
   include Verification
-  def initialize
+  def initialize(code)
+    @code = code
     @turn = 0
     @guess = [1, 1, 2, 2]
-    @all_guesses = (1111..7777).to_a
-    format_all_guesses
+    @all_solutions = [1, 2, 3, 4, 5, 6, 7, 8].repeated_permutation(4).to_a
   end
 
-  # Converts 1111 to [1, 1, 1, 1] for example
-  def format_all_guesses
-    @all_guesses.map! do |guess|
-      guess.to_s.split('').map!(&:to_i)
-    end
+  def check_guess_computer
+    check_guess(@code, @guess)
   end
 
-  def check_guess_computer(code)
-    check_guess(code, @guess)
+  def correct_guess_computer?
+    correct_guess?(@code, @guess)
   end
 
-  def correct_guess_computer?(code)
-    correct_guess?(code, @guess)
+  def play
+    # while @turn < 12
+      puts "\nNumber of turns: #{@turn}\n\n"
+      # @turn += 1
+      if correct_guess_computer? == true
+        puts "\nThe computer guessed your code in #{@turn} turns!"
+        # break
+      else
+        puts check_guess_computer
+      end
+    # end
   end
 end
 
@@ -114,9 +120,8 @@ def codemaker_player
     code.input_prompt
   end
   puts "Code: #{code.convert_to_i}"
-  play = CodebreakerComputer.new
-  p play.all_guesses.length
-  # play.check_guess_computer(code.convert_to_i)
+  computer = CodebreakerComputer.new(code.convert_to_i)
+  computer.play
 end
 
 def codebreaker_player
@@ -136,7 +141,8 @@ def codebreaker_player
         puts "\nYou guessed correctly in #{turn} turns!"
         break
       else
-        puts code.check_guess_player(guess.convert_to_i)
+        pegs = code.check_guess_player(guess.convert_to_i)
+        puts "Red peg: #{pegs[:red]}. White peg: #{pegs[:white]}"
       end
     else
       puts "\nInvalid input. Try again.\n"
