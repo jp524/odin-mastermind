@@ -3,13 +3,16 @@
 # Compares a secret code and a guess and provides feedback
 module Verification
   def check_guess(code, guess)
+    pegs = []
     code.each_with_index do |number, i|
       if number == guess[i]
-        puts 'red peg'
+        pegs.push('red')
+        next
       elsif guess.include?(number)
-        puts 'white peg'
+        pegs.push('white')
       end
     end
+    pegs
   end
 
   def correct_guess?(code, guess)
@@ -68,6 +71,10 @@ class CodemakerComputer
 
   def correct_guess_player?(guess)
     correct_guess?(@secret_combination, guess)
+  end
+
+  def display_code
+    @secret_combination
   end
 end
 
@@ -129,7 +136,7 @@ def codebreaker_player
         puts "\nYou guessed correctly in #{turn} turns!"
         break
       else
-        code.check_guess_player(guess.convert_to_i)
+        puts code.check_guess_player(guess.convert_to_i)
       end
     else
       puts "\nInvalid input. Try again.\n"
@@ -138,7 +145,7 @@ def codebreaker_player
     end
   end
 
-  puts "\nYou used all 12 turns. Try again!" if turn == 12
+  puts "\nYou used all 12 turns. Try again!. The code was #{code.display_code}." if turn == 12
 end
 
 # Starts game
